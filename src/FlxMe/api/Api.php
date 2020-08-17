@@ -59,6 +59,10 @@ class Api {
         }
     }
 
+    public function setData() {
+
+    }
+
 
 
     public static function DataFolder() {
