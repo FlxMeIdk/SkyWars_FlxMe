@@ -19,8 +19,11 @@
 namespace FlxMe\event;
 
 
+use FlxMe\api\Api;
+use FlxMe\arena\ArenaCreator;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerInteractEvent;
 
 class Events implements Listener {
 
@@ -28,6 +31,13 @@ class Events implements Listener {
         $player = $event->getPlayer();
     }
 
+    public function onInteract(PlayerInteractEvent $event) {
+        $player = $event->getPlayer();
+        $block = $event->getBlock();
 
+        if (Api::isCreator($player->getName()) && Api::isCreating($player->getLevel()->getFolderName())) {
+            ArenaCreator::getInstance()->saveSpawn($player, $player->getLevel(), [$block->getX(), $block->getY(), $block->getZ()]);
+        }
+    }
 
 }

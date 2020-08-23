@@ -26,10 +26,17 @@ use pocketmine\utils\Config;
 
 class Api {
 
+    /** @var array  */
+    public static $players = [];
+
     public static function isCreator(string $name) {
         if (in_array($name, ArenaCreator::getInstance()->creators)) {
             return true;
         }
+    }
+
+    public static function getAllPlayers(): int {
+        return count(self::$players);
     }
 
     public static function inGame(string $arena) {
@@ -54,16 +61,37 @@ class Api {
             return;
         }
 
-        if (self::inGame($levle) and $player->isCreative()) {
+        if (self::inGame($levle) and $player->isSurvival()) {
             return true;
         }
     }
 
-    public function setData() {
+    public function getPlayerSpawn(Player $player) {
 
     }
 
+    public static function getPlayerSlot(Player $player) {
+        $level = $player->getLevel()->getFolderName();
+        $confg = new Config(self::DataFolder() . "/arenas/" . "{$level}.yml", Config::YAML);
 
+        $slots = $confg->get("slots");
+        for ($i = 1; $i < 12; $i++) {
+            if ($slots[$i] === $player->getName()) {
+               return $i;
+            }
+        }
+    }
+
+    public function disconectPlayer(Player $player) {
+    }
+
+    public static function isCreating(string $arena) {
+        $confg = new Config(self::DataFolder() . "/arenas/" . "{$arena}.yml", Config::YAML);
+
+        if ($confg->get("creating") !== false){
+            return true;
+        }
+    }
 
     public static function DataFolder() {
         return SkyWars::getInstance()->getDataFolder();

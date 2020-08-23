@@ -60,6 +60,7 @@ class ArenaCreator {
             "spawns" => [],
             "enable" => false,
             "in-game" => false,
+            "creating" => true,
             "in-reset" => false
         ]);
         $spawns = [];
@@ -71,35 +72,39 @@ class ArenaCreator {
             'y' => null,
             'z' => null
         ]));
+        $config->set("slots", array_fill_keys($spawns, null));
         $config->save();
     }
 
     public function saveSpawn(Player $sender, $level, array $position) {
-        if ($this->clock === 12){
-            return;
-        }
-
         $prefix = C::YELLOW . C::BOLD . "Sky" . C::BLUE . "Wars" . C::GOLD . " : ";
         if (!is_file($this->getDataFolder() . "/arenas/" . "{$level}.yml")) {
             return;
         }
 
         $config = new Config($this->getDataFolder() . "/arenas/" . "{$level}.yml", Config::YAML);
-        if ($config->get("enable") !== false)  {
+        if ($config->get("creating") === false)  {
             return;
+        } else {
+            if ($this->clock === 13){
+                $sender->sendMessage($prefix . C::GREEN . " spawns guardados");
+                sleep(2);
+                $sender->sendMessage($prefix . C::GREEN . " usa /sw save (arena)");
+                return;
+            }
+
+            $spawns = $config->get("sapwns");
+            $spawns[$this->clock] = [
+                'x' => $position[0],
+                'y' => $position[1],
+                'z' => $position[2]
+            ];
+
+            $config->set("spawns", $spawns);
+            $config->save();
+            $sender->sendMessage($prefix . C::GREEN . " spawn " . C::DARK_GREEN . "{$this->clock}" . C::GREEN  . "registrado");
+            $this->clock++;
         }
-
-        $spawns = $config->get("sapwns");
-        $spawns[$this->clock] = [
-            'x' => $position[0],
-            'y' => $position[1],
-            'z' => $position[2]
-        ];
-
-        $config->set("spawns", $spawns);
-        $config->save();
-        $sender->sendMessage($prefix . C::GREEN . " spawn " . C::DARK_GREEN . "{$this->clock}" . C::GREEN  . "registrado");
-        $this->clock++;
     }
 
     public function saveArena(Player $sender, string $arena) {
@@ -119,8 +124,10 @@ class ArenaCreator {
         }
 
         $config->set("enable", true);
+        $config->set("creating", false);
         $config->save();
         $sender->sendMessage($prefix . C::GREEN . "sea habilitado la arena " . C::DARK_GREEN . "{$arena}");
+        $this->clock = 1;
         unset($this->creators[$sender->getName()]);
     }
 

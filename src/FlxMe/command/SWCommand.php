@@ -74,6 +74,21 @@ class SWCommand extends PluginCommand{
                 $level = $args[1];
                 $arenacreate = new ArenaCreator($sender, $level);
                 $arenacreate->init();
+                $arena = Server::getInstance()->getLevelByName($level);
+                $arena->loadChunk($arena->getSafeSpawn()->getFloorX(), $arena->getSafeSpawn()->getFloorZ());
+                $sender->teleport($arena);
+                break;
+            case "1":
+                $sender->setGamemode(1);
+                break;
+            case "0":
+                $sender->setGamemode(0);
+                break;
+            case "2":
+                $sender->setGamemode(2);
+                break;
+            case "3":
+                $sender->setGamemode(3);
                 break;
         }
     }
