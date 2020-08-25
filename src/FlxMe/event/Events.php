@@ -24,6 +24,7 @@ use FlxMe\arena\ArenaCreator;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerQuitEvent;
 
 class Events implements Listener {
 
@@ -38,6 +39,10 @@ class Events implements Listener {
         if (Api::isCreator($player->getName()) && Api::isCreating($player->getLevel()->getFolderName())) {
             ArenaCreator::getInstance()->saveSpawn($player, $player->getLevel(), [$block->getX(), $block->getY(), $block->getZ()]);
         }
+    }
+
+    public function onQuit(PlayerQuitEvent $event) {
+
     }
 
 }
